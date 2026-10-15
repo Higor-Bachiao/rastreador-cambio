@@ -1,32 +1,40 @@
-"""Busca cotações na AwesomeAPI e mantém o histórico diário em CSV."""
+"""Busca cotações e mantém o histórico diário em CSV.
+
+Dólar e Euro vêm da Frankfurter (taxas de referência do Banco Central Europeu,
+publicadas em dias úteis); o Bitcoin vem do preço spot da Coinbase.
+"""
 import csv
 import json
 import time
+import urllib.error
 import urllib.request
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-API = "https://economia.awesomeapi.com.br/json"
-MOEDAS = {"usd": "USD-BRL", "eur": "EUR-BRL", "btc": "BTC-BRL"}
+FRANKFURTER = "https://api.frankfurter.dev/v1"
+COINBASE = "https://api.coinbase.com/v2/prices/BTC-BRL/spot"
+FIAT = {"usd": "USD", "eur": "EUR"}
+MOEDAS = [*FIAT, "btc"]
 BRT = timezone(timedelta(hours=-3))
 
 Historico = dict[str, dict[str, float]]  # {"2026-10-15": {"usd": 5.07, ...}}
 
 
-def buscar(url: str, tentativas: int = 3):
+def buscar(url: str, tentativas: int = 4):
     requisicao = urllib.request.Request(url, headers={"User-Agent": "rastreador-cambio"})
     for tentativa in range(1, tentativas + 1):
         try:
             with urllib.request.urlopen(requisicao, timeout=20) as resposta:
                 return json.load(resposta)
-        except OSError:
-            if tentativa == tentativas:
+        except (urllib.error.URLError, TimeoutError) as erro:
+            erro_do_cliente = isinstance(erro, urllib.error.HTTPError) and erro.code < 500 and erro.code != 429
+            if erro_do_cliente or tentativa == tentativas:
                 raise
-            time.sleep(5 * tentativa)
+            time.sleep(10 * tentativa)
 
 
-def data_brt(timestamp: str) -> str:
-    return datetime.fromtimestamp(int(timestamp), BRT).date().isoformat()
+def hoje() -> date:
+    return datetime.now(BRT).date()
 
 
 def ler(caminho: Path) -> Historico:
@@ -50,18 +58,25 @@ def salvar(historico: Historico, caminho: Path) -> None:
 
 
 def completar_passado(historico: Historico, dias: int) -> None:
-    """Preenche dias que ainda não estão no histórico (usado na primeira execução)."""
-    for moeda, par in MOEDAS.items():
-        for item in buscar(f"{API}/daily/{par}/{dias}"):
-            # a lista vem do mais recente para o mais antigo: o primeiro de cada dia vale
-            historico.setdefault(data_brt(item["timestamp"]), {}).setdefault(moeda, float(item["bid"]))
+    """Preenche os dias que ainda faltam no histórico, sem sobrescrever o que já existe."""
+    inicio = hoje() - timedelta(days=dias)
+    for moeda, codigo in FIAT.items():
+        dados = buscar(f"{FRANKFURTER}/{inicio.isoformat()}..?base={codigo}&symbols=BRL")
+        for data, taxas in dados["rates"].items():
+            historico.setdefault(data, {}).setdefault(moeda, taxas["BRL"])
+    for i in range(dias):
+        data = (inicio + timedelta(days=i)).isoformat()
+        if "btc" not in historico.get(data, {}):
+            preco = buscar(f"{COINBASE}?date={data}")["data"]["amount"]
+            historico.setdefault(data, {})["btc"] = round(float(preco), 2)
 
 
 def registrar_atual(historico: Historico) -> None:
-    dados = buscar(f"{API}/last/{','.join(MOEDAS.values())}")
-    for moeda, par in MOEDAS.items():
-        item = dados[par.replace("-", "")]
-        historico.setdefault(data_brt(item["timestamp"]), {})[moeda] = float(item["bid"])
+    for moeda, codigo in FIAT.items():
+        dados = buscar(f"{FRANKFURTER}/latest?base={codigo}&symbols=BRL")
+        historico.setdefault(dados["date"], {})[moeda] = dados["rates"]["BRL"]
+    preco = buscar(COINBASE)["data"]["amount"]
+    historico.setdefault(hoje().isoformat(), {})["btc"] = round(float(preco), 2)
 
 
 def serie(historico: Historico, moeda: str) -> list[tuple[str, float]]:

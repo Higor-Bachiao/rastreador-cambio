@@ -1,5 +1,6 @@
 import tempfile
 import unittest
+from unittest import mock
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -20,9 +21,18 @@ class ColetaTest(unittest.TestCase):
             coleta.salvar(HISTORICO, caminho)
             self.assertEqual(coleta.ler(caminho), HISTORICO)
 
-    def test_data_brt_usa_fuso_de_brasilia(self):
-        # 2026-10-15 02:00 UTC ainda é dia 14 em Brasília
-        self.assertEqual(coleta.data_brt("1792029600"), "2026-10-14")
+    def test_completar_passado_nao_sobrescreve_dias_existentes(self):
+        def resposta(url):
+            if "frankfurter" in url:
+                return {"rates": {"2026-10-14": {"BRL": 9.99}, "2026-10-15": {"BRL": 5.2}}}
+            return {"data": {"amount": "430000.123"}}
+
+        historico = {"2026-10-14": {"usd": 5.10, "eur": 5.65, "btc": 405000.0}}
+        with mock.patch.object(coleta, "buscar", side_effect=resposta), \
+             mock.patch.object(coleta, "hoje", return_value=coleta.date(2026, 10, 16)):
+            coleta.completar_passado(historico, 2)
+        self.assertEqual(historico["2026-10-14"], {"usd": 5.10, "eur": 5.65, "btc": 405000.0})
+        self.assertEqual(historico["2026-10-15"], {"usd": 5.2, "eur": 5.2, "btc": 430000.12})
 
     def test_serie_ignora_dias_sem_a_moeda(self):
         self.assertEqual(len(coleta.serie(HISTORICO, "usd")), 3)

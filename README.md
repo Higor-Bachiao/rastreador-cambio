@@ -7,11 +7,11 @@ Coleta todos os dias a cotação do **Dólar**, do **Euro** e do **Bitcoin** em 
 <!-- COTACOES:INICIO -->
 | Moeda | Cotação | 1 dia | 7 dias | 30 dias |
 |---|---:|---:|---:|---:|
-| Dólar (USD) | R$ 5,0714 | 🟢 ▲ 0,47% | 🟢 ▲ 1,07% | 🔴 ▼ 1,58% |
-| Euro (EUR) | R$ 5,6918 | 🟢 ▲ 0,84% | 🟢 ▲ 1,14% | 🔴 ▼ 4,15% |
-| Bitcoin (BTC) | R$ 417.512 | 🟢 ▲ 1,15% | 🟢 ▲ 1,41% | 🟢 ▲ 6,79% |
+| Dólar (USD) | R$ 5,0570 | 🟢 ▲ 0,65% | 🟢 ▲ 0,80% | 🔴 ▼ 1,83% |
+| Euro (EUR) | R$ 5,6679 | 🟢 ▲ 0,77% | 🟢 ▲ 1,00% | 🔴 ▼ 4,65% |
+| Bitcoin (BTC) | R$ 415.964 | 🔴 ▼ 0,43% | 🔴 ▼ 0,51% | 🟢 ▲ 3,54% |
 
-<sub>Última atualização: 15/10/2026 · Fonte: AwesomeAPI</sub>
+<sub>Última atualização: 15/10/2026 · Fontes: Banco Central Europeu (via Frankfurter) e Coinbase</sub>
 <!-- COTACOES:FIM -->
 
 <p align="center">
@@ -21,10 +21,10 @@ Coleta todos os dias a cotação do **Dólar**, do **Euro** e do **Bitcoin** em 
 ## Como funciona
 
 ```
-GitHub Actions (todo dia, 9h de Brasília)
+GitHub Actions (todo dia, 15h de Brasília)
         │
         ▼
-python -m cambio ──► AwesomeAPI (cotação atual + dias faltantes)
+python -m cambio ──► Frankfurter (Dólar e Euro) + Coinbase (Bitcoin)
         │
         ├──► data/historico.csv   histórico diário (um dia por linha)
         ├──► assets/grafico.svg   gráfico gerado em SVG puro, sem bibliotecas
@@ -34,8 +34,9 @@ python -m cambio ──► AwesomeAPI (cotação atual + dias faltantes)
 commit automático com o histórico atualizado
 ```
 
+- **Fontes:** Dólar e Euro usam a [Frankfurter](https://frankfurter.dev), com as taxas de referência do Banco Central Europeu (só em dias úteis); o Bitcoin usa o preço spot da [Coinbase](https://docs.cdp.coinbase.com/coinbase-app/docs/api-prices), todos os dias.
 - **Sem dependências:** só a biblioteca padrão do Python (`urllib`, `csv`, `json`).
-- **Histórico completo desde o início:** na primeira execução o script busca os últimos 90 dias; nas seguintes, registra o dia e preenche eventuais buracos da última semana.
+- **Histórico completo desde o início:** na primeira execução o script busca os últimos 90 dias; nas seguintes, registra o dia e preenche eventuais buracos da última semana sem sobrescrever o que já foi salvo.
 - **Resiliente:** repete a requisição em caso de falha de rede, e os testes rodam antes de qualquer commit.
 - **Dado aberto:** o [`historico.csv`](data/historico.csv) pode ser usado em qualquer análise.
 

@@ -33,7 +33,7 @@ def tabela(historico: Historico) -> str:
             f"{variacao(pontos, 1)} | {variacao(pontos, 7)} | {variacao(pontos, 30)} |"
         )
     atualizado = date.fromisoformat(max(datas)).strftime("%d/%m/%Y")
-    return "\n".join(linhas) + f"\n\n<sub>Última atualização: {atualizado} · Fonte: AwesomeAPI</sub>"
+    return "\n".join(linhas) + f"\n\n<sub>Última atualização: {atualizado} · Fontes: Banco Central Europeu (via Frankfurter) e Coinbase</sub>"
 
 
 def atualizar(texto: str, historico: Historico) -> str:
