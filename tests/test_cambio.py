@@ -1,3 +1,4 @@
+import io
 import tempfile
 import unittest
 from unittest import mock
@@ -33,6 +34,15 @@ class ColetaTest(unittest.TestCase):
             coleta.completar_passado(historico, 2)
         self.assertEqual(historico["2026-10-14"], {"usd": 5.10, "eur": 5.65, "btc": 405000.0})
         self.assertEqual(historico["2026-10-15"], {"usd": 5.2, "eur": 5.2, "btc": 430000.12})
+
+    def test_buscar_tenta_de_novo_apos_erro_momentaneo(self):
+        erro = coleta.urllib.error.HTTPError("url", 404, "Not Found", {}, None)
+        resposta = mock.MagicMock()
+        resposta.__enter__.return_value = io.BytesIO(b'{"ok": true}')
+        with mock.patch.object(coleta.urllib.request, "urlopen", side_effect=[erro, resposta]) as urlopen, \
+             mock.patch.object(coleta.time, "sleep"):
+            self.assertEqual(coleta.buscar("https://exemplo.dev/api"), {"ok": True})
+        self.assertEqual(urlopen.call_count, 2)
 
     def test_serie_ignora_dias_sem_a_moeda(self):
         self.assertEqual(len(coleta.serie(HISTORICO, "usd")), 3)

@@ -26,9 +26,9 @@ def buscar(url: str, tentativas: int = 4):
         try:
             with urllib.request.urlopen(requisicao, timeout=20) as resposta:
                 return json.load(resposta)
-        except (urllib.error.URLError, TimeoutError) as erro:
-            erro_do_cliente = isinstance(erro, urllib.error.HTTPError) and erro.code < 500 and erro.code != 429
-            if erro_do_cliente or tentativa == tentativas:
+        except (urllib.error.URLError, TimeoutError, ValueError):
+            # as APIs às vezes devolvem 404/429/5xx momentâneos: vale tentar de novo
+            if tentativa == tentativas:
                 raise
             time.sleep(10 * tentativa)
 
