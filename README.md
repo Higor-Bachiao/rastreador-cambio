@@ -9,9 +9,9 @@ Coleta todos os dias a cotação do **Dólar**, do **Euro** e do **Bitcoin** em 
 |---|---:|---:|---:|---:|
 | Dólar (USD) | R$ 5,6637 | 🟢 ▲ 0,83% | 🟢 ▲ 2,91% | 🟢 ▲ 12,73% |
 | Euro (EUR) | R$ 6,2595 | 🟢 ▲ 0,57% | 🟢 ▲ 1,86% | 🟢 ▲ 11,29% |
-| Bitcoin (BTC) | R$ 387.625 | 🔴 ▼ 3,71% | 🔴 ▼ 7,20% | 🔴 ▼ 7,22% |
+| Bitcoin (BTC) | R$ 367.348 | 🔴 ▼ 5,23% | 🔴 ▼ 11,67% | 🔴 ▼ 11,69% |
 
-<sub>Última atualização: 13/11/2026 · Fontes: Banco Central Europeu (via Frankfurter) e Coinbase</sub>
+<sub>Última atualização: 14/11/2026 · Fontes: Banco Central Europeu (via Frankfurter) e Coinbase</sub>
 <!-- COTACOES:FIM -->
 
 <p align="center">
