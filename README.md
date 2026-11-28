@@ -7,11 +7,11 @@ Coleta todos os dias a cotação do **Dólar**, do **Euro** e do **Bitcoin** em 
 <!-- COTACOES:INICIO -->
 | Moeda | Cotação | 1 dia | 7 dias | 30 dias |
 |---|---:|---:|---:|---:|
-| Dólar (USD) | R$ 5,7651 | 🔴 ▼ 2,31% | 🔴 ▼ 2,15% | 🟢 ▲ 7,81% |
-| Euro (EUR) | R$ 6,3272 | 🔴 ▼ 1,95% | 🔴 ▼ 2,31% | 🟢 ▲ 6,12% |
-| Bitcoin (BTC) | R$ 343.317 | 🔴 ▼ 2,85% | 🔴 ▼ 6,56% | 🔴 ▼ 20,84% |
+| Dólar (USD) | R$ 5,4984 | 🔴 ▼ 4,63% | 🔴 ▼ 7,40% | 🟢 ▲ 3,22% |
+| Euro (EUR) | R$ 6,0246 | 🔴 ▼ 4,78% | 🔴 ▼ 7,68% | 🟢 ▲ 1,58% |
+| Bitcoin (BTC) | R$ 333.072 | 🔴 ▼ 2,98% | 🔴 ▼ 4,88% | 🔴 ▼ 23,39% |
 
-<sub>Última atualização: 26/11/2026 · Fontes: Banco Central Europeu (via Frankfurter) e Coinbase</sub>
+<sub>Última atualização: 27/11/2026 · Fontes: Banco Central Europeu (via Frankfurter) e Coinbase</sub>
 <!-- COTACOES:FIM -->
 
 <p align="center">
